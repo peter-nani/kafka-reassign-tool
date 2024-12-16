@@ -80,13 +80,14 @@ def get_brokers()
         brokers = $1.split(',').collect(&:strip).collect(&:to_i)
       end
     }
+    puts "brokers: #{brokers}"
 
     brokers
 end
 
 def get_topics()
     result = run(get_kafka_root + '/bin/kafka-topics.sh', [
-                 '--zookeeper', get_zk_url,
+                 '--bootstrap-server', 'localhost:9092',
                  '--list'
                 ])
     result[:out].lines.collect(&:strip)
@@ -116,7 +117,7 @@ def get_current_assignments(topics, brokers)
   topics_file.close
 
   result = run(get_kafka_root + '/bin/kafka-reassign-partitions.sh', [
-               '--zookeeper', get_zk_url,
+               '--bootstrap-server', 'localhost:9092',
                '--topics-to-move-json-file', topics_file.path,
                '--broker-list', brokers.join(','),
                '--generate'
